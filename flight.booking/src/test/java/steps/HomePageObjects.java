@@ -9,7 +9,7 @@ public class HomePageObjects {
 	public By departure = By.id("departureCalendar");
 	public By traveller = By.id("pax_link_common");
 	public By search = By.id("gi_search_btn");
-	public By book = By.xpath("//span[contains (text(),'Cheapest')]/ancestor::div[@class='dF justifyBetween']/following-sibling::div//button[text()='BOOK']");
+	public By book = By.xpath("//span[text()='Cheapest']/ancestor::div[contains(@class,'justify')]/following-sibling::div//button");
 	public By review = By.xpath("//div[contains(@class,'justifyBetween alignItemsCenter')]//span");
 	public By amount = By.xpath("//span[contains(text(),'Total Amount')]//parent::div/following-sibling::div/child::div//span");
 }

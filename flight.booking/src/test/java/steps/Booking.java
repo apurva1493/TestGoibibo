@@ -1,7 +1,10 @@
 package steps;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.runner.notification.Failure;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -14,6 +17,9 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import junit.framework.Assert;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestResult;
 
 public class Booking {
 	public WebDriver driver;
@@ -26,6 +32,9 @@ public class Booking {
 		// Write code here that turns the phrase above into concrete actions
 		this.driver.get("https://www.goibibo.com/");
 		this.driver.manage().window().maximize();
+		
+		 //String envRootDir = System.getProperty("user.dir");
+		 //System.out.println("PATH IS >>"+ envRootDir);	
 	}
 
 	@When("Provide the inputs to all fields_oneway")
@@ -79,7 +88,7 @@ public class Booking {
 	public void provide_the_inputs_to_all_fields_multicity() throws Throwable {
 		//For Two way booking
 				this.driver.findElement(homePageObjects.multiCity).click();
-				this.FillDetails("Pune", "Dubai","two", true);	
+				this.FillDetails("Pune", "Dubai","multi", true);	
 	}
 
 	@Then("^Review the page_multicity$")
@@ -88,9 +97,10 @@ public class Booking {
 		// CLick on book buton
 		this.driver.findElement(By.cssSelector(".button.orange.fr")).click();
 		Thread.sleep(10000);
+		this.ValidateDetailsMultiWay();
 	}
 
-	@Before
+	@Before  //cucumber hooks
 	public void setup() {
 		WebDriverManager.chromedriver().setup();
 		this.driver = new ChromeDriver();
@@ -99,6 +109,7 @@ public class Booking {
 
 	@After
 	public void end() {
+	
 		this.driver.quit();
 	}
 
@@ -134,9 +145,9 @@ public class Booking {
 		}
 		else
 		{
-			travelDate = this.driver.findElement(By.cssSelector(".DayPicker-Day.DayPicker-Day--selected")).getAttribute("aria-label");
+			travelDate = this.driver.findElement(By.xpath("//div[contains(@class,'DayPicker-Day--selected')]/following-sibling::div")).getAttribute("aria-label");
 			// Current Date selected for travel Start
-			this.driver.findElement(By.cssSelector(".DayPicker-Day.DayPicker-Day--selected")).click();	
+			this.driver.findElement(By.xpath("//div[contains(@class,'DayPicker-Day--selected')]/following-sibling::div")).click();	
 
 			// For Return date
 			if(type == "two")
@@ -149,8 +160,8 @@ public class Booking {
 			}
 			else
 			{
-				this.driver.findElements(homePageObjects.dest).get(1).sendKeys("Dubai");
-				this.driver.findElement(homePageObjects.dest).findElements(By.xpath("following-sibling::ul//li")).get(0).click();
+				this.driver.findElements(homePageObjects.dest).get(1).sendKeys("Pune");
+				this.driver.findElements(homePageObjects.dest).get(1).findElement(By.xpath("following-sibling::ul//li")).click();
 				
 				// Next Month arrow
 				this.driver.findElement(By.cssSelector(".DayPicker-NavButton.DayPicker-NavButton--next")).click();
@@ -183,6 +194,17 @@ public class Booking {
 		Assert.assertTrue(fromBookingPage.contains(from) && toBookingPage.contains(to));
 
 		System.out.println("Date calculated" + this.travelDate);
+		System.out.println("Final Date "+travelDateFromBookingPage);
+		Assert.assertTrue(travelDate.equals(travelDateFromBookingPage));
+
+		System.out.println("Validation Done");
+	}
+	
+	public void ValidateDetailsMultiWay()
+	{
+    	// Get Date from booking Page
+		String travelDateFromBookingPage = this.driver.findElement(By.xpath("//div[contains(@class,'bkFlt ')]//span[contains(@class,'co12 db grey')]")).getText();
+			System.out.println("Date calculated" + this.travelDate);
 		System.out.println("Final Date "+travelDateFromBookingPage);
 		Assert.assertTrue(travelDate.equals(travelDateFromBookingPage));
 
